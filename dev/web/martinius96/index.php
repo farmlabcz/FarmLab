@@ -5,9 +5,10 @@
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="user-scalable=0, width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="icon" type="image/png" href="icon.png" />
-    <link rel="stylesheet" href="css/misc.css">
+    <link rel="stylesheet" href="CSS/misc.css">
+	<link id="pre-load-login-css" rel="stylesheet" href="CSS/loader.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-		<link id="pre-load-login-css" rel="stylesheet" href="css/loader.css">
+		
 </head>
 <body class="light-mode">
   <div class="login-container">

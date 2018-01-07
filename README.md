@@ -6,7 +6,7 @@
 
 
 # Vývoj
-* Vývoj sa začal krátko po roku 2018
+* Vývoj sa začal krátko po roku 2018 so zacielením na aktuálnu sezónu pestovania rastlín
 * Projekt je pod licenciou GNU GPL 3.0 - free software
 
 # Obsadenie
@@ -27,3 +27,7 @@
 
 # Popis projektu:
 * https://docs.google.com/document/d/1qNchcJHHbX9sSYHLxn99GLeRxJUnl9N6arXQz7Zs8E0
+
+# O projekte
+* https://arduino.cz/farmlab-vypestujte-si-vlastni-zeleninu/
+

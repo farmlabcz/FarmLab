@@ -1,0 +1,3 @@
+2017-11-18 10:01:30 Pouzivatel z ip 80.251.241.XXX sa neprihlasil, zadal zle prihlasovacie informacie, meno: root a heslo: root
+2017-11-18 15:35:49 Pouzivatel z ip 188.123.100.XXX sa neprihlasil, zadal zle prihlasovacie informacie, meno: gfgd a heslo: fdgd
+2017-12-12 09:39:53 Pouzivatel z ip 147.232.153.XXX sa neprihlasil, zadal zle prihlasovacie informacie, meno: admin a heslo: admin

@@ -1,5 +1,5 @@
 # FarmLab
-* FarmLab je projekt pestovania čerstvej zeleniny a ovocia s využitím mikrkontrolérov a IoT sietí. 
+* FarmLab je projekt pestovania čerstvej zeleniny a ovocia s využitím mikrokontrolérov a IoT sietí. 
 * Projekt sa neorientuje na veľkopestovateľov plodín.
 * Projekt sa zameriava na svojpomocné dopestovanie plodín
 ![Alt Text](https://1588504457.rsc.cdn77.org/wp-content/uploads/zelenina1-900x506.jpg)

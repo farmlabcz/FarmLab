@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 
 <html><head><meta http-equiv="Content-Type" charset=UTF-8">
-    <title>Smart Home</title>
+    <title>FarmLab</title>
     <meta name="robots" content="noindex, nofollow">
     <meta name="viewport" content="user-scalable=0, width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="icon" type="image/png" href="icon.png" />

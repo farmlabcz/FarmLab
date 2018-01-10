@@ -1,0 +1,9 @@
+FLSigfox	KEYWORD1
+insideSensorsRead	KEYWORD2
+sleep	KEYWORD2
+wake	KEYWORD2
+voltageRead	KEYWORD2
+tempRead	KEYWORD2
+sensorStore	KEYWORD2
+dataClear	KEYWORD2
+dataSend	KEYWORD2

@@ -20,7 +20,7 @@
 
 // Settings
 #define MY_NODE_ID 0
-#define SIGFOX_SEND_INTERVAL 15 // Sigfox LPWAN module connection interval in minutes
+#define SIGFOX_SEND_INTERVAL 2 // Sigfox LPWAN module connection interval in minutes
 #define WAKE_DURATION 500 // Wake duration of the AVR and Radio in milliseconds
 //#define SLEEP_DURATION SLEEP_8S // Sleep duration of AVR and NRF24
 
@@ -38,9 +38,8 @@ FLNRF24 nrf24(9,10);
 
 void setup() {
   Serial.begin(9600);
-  sigfox.sleep();
   nrf24.init();
-
+  sigfox.sleep();
 
 }
 
@@ -52,8 +51,8 @@ void loop() {
      //Serial.println(millis());
      //Serial.println(nextSigfoxSend);
     
-    //Serial.println("Data received on NRF24 radio.");
-    sigfox.sensorAutoStore(nrf24.sensorID,nrf24.data);
+    Serial.println("Data received on NRF24 radio.");
+    sigfox.sensorAutoStore(nrf24.sensorID,nrf24.data,nrf24.dataPriority);
 /*
     Serial.print("Received payload: ");
     Serial.println(nrf24.PACKET[0]);
@@ -114,6 +113,7 @@ void loop() {
      nrf24.wake();
      nextSleep = millis() + WAKE_DURATION;
      sleepCycleCounter+= 1;
+     if (nextSigfoxSend < 8001) {nextSigfoxSend = 8001;}
      nextSigfoxSend-= 8000; // If sleep duration change then this value also have to be changed according to sleep duration milliseconds
      //Serial.println("Chip + NRF24 wake up now.");
      //delay(1000);    
@@ -123,15 +123,17 @@ void loop() {
    // Check if time to send data via Sigfox LPWAN
    if (millis() > nextSigfoxSend)
    { 
-     //Serial.println("Time to send data via Sigfox.");
+     Serial.println("Time to send data via Sigfox.");
      nrf24.sleep();
      delay(10);
      sigfox.wake();
      if (sigfox.dataSend())
      {
-       //Serial.println("Data send successfully via Sigfox.");
+       Serial.println("Data send successfully via Sigfox.");
      } else {
-       //Serial.println("Failed to send data via Sigfox.");
+       // Retry one more time to send data via Sigfox
+       sigfox.dataSend();
+       Serial.println("Failed to send data via Sigfox.");
      }
 
      sigfox.sleep();

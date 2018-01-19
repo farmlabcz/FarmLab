@@ -28,6 +28,7 @@ void FLSigfox::sleep()
 
 void FLSigfox::wake()
 {
+  mySerial->print('\n');
   mySerial->print('\r');
   _sigfoxUp=true;
   delay(500);
@@ -146,6 +147,7 @@ void FLSigfox::sensorStore(byte position, byte value, byte priority, byte sensor
   _priorityStatus[position] = priority;
 }
 
+/*
 bool FLSigfox::sensorPriority(byte sensorID, byte priority) {
   if (sensorID>50) {
     return false;
@@ -154,8 +156,9 @@ bool FLSigfox::sensorPriority(byte sensorID, byte priority) {
     return true;
   }
 }
+*/
 
-bool FLSigfox::sensorAutoStore(byte sensorID, byte value) {
+bool FLSigfox::sensorAutoStore(byte sensorID, byte value, byte priority) {
   bool positionFound = false;
   byte i = 0;
   byte futurePosition = 100;
@@ -166,7 +169,7 @@ bool FLSigfox::sensorAutoStore(byte sensorID, byte value) {
     {
       _dataArray[i] = value;
       _dataArray[i+6] = sensorID;
-      _priorityStatus[i] = _priorityArray[sensorID];
+      _priorityStatus[i] = priority;
       positionFound = true;
       return true;
     }
@@ -177,7 +180,7 @@ bool FLSigfox::sensorAutoStore(byte sensorID, byte value) {
     if (_dataArray[i] == 255) {
       _dataArray[i] = value;
       _dataArray[i+6] = sensorID;
-      _priorityStatus[i] = _priorityArray[sensorID];
+      _priorityStatus[i] = priority;
       positionFound = true;
       return true;
     } else {
@@ -192,7 +195,7 @@ bool FLSigfox::sensorAutoStore(byte sensorID, byte value) {
       } else {
         _dataArray[futurePosition] = value;
         _dataArray[futurePosition+6] = sensorID;
-        _priorityStatus[futurePosition] = _priorityArray[sensorID];
+        _priorityStatus[futurePosition] = priority;
       }
     }
    i+=1;  

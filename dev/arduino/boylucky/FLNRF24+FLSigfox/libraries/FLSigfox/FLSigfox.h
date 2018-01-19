@@ -22,8 +22,8 @@ class FLSigfox
     void voltageRead();
     void tempRead();
     void sensorStore(byte position, byte value, byte priority, byte sensorID);
-    bool sensorPriority(byte sensorID, byte priority);
-    bool sensorAutoStore(byte sensorID, byte value);
+    //bool sensorPriority(byte sensorID, byte priority);
+    bool sensorAutoStore(byte sensorID, byte value, byte priority);
     byte readStore(byte position);
     void dataClear();
     bool dataSend();
@@ -34,7 +34,7 @@ class FLSigfox
     char *toHex( uint8_t c );
     byte _dataArray[12] = {255,255,255,255,255,255,255,255,255,255,255,255};
     byte _priorityStatus[6] = {0,0,0,0,0,0};
-    byte _priorityArray[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+    //byte _priorityArray[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     bool _sigfoxUp;
     SoftwareSerial* mySerial;
 };

@@ -16,16 +16,17 @@ class FLNRF24 : public RF24
     bool checkRadio();
     //bool processData();
     // Variables for PACKET and specific parts of it
-    byte PACKET[8];
+    byte PACKET[7];
     byte destinationID;
     byte senderID;
     byte sensorID;
     byte dataType;
+    byte dataPriority;
     byte data;
     void sleep();    
     void wake();
     bool sendPacket();
-    void makePacket(byte _destinationID, byte _senderID, byte _sensorID, byte _dataType, byte _data );
+    void makePacket(byte _destinationID, byte _senderID, byte _sensorID, byte _dataType, byte _dataPriority, byte _data );
   private:
     //Specify the reading pipes
     const uint64_t _readingPipes[5] = { 0xFFFFFF10, 0xFFFFFF11, 0xFFFFFF12, 0xFFFFFF13, 0xFFFFFF14 };
@@ -39,7 +40,7 @@ void FLNRF24::init()
   begin();
   // 4 values to set for long range distance radio, set to MAX power for max long range
   // Max power 
-  setPALevel( RF24_PA_MAX ) ; 
+  setPALevel( RF24_PA_MIN ) ; 
   // Min speed
   setDataRate( RF24_250KBPS ) ;
   // 8 bits CRC
@@ -48,7 +49,7 @@ void FLNRF24::init()
   setRetries(1,15);
   // optionally, reduce the payload size.  seems to
   // improve reliability
-  setPayloadSize(8);
+  setPayloadSize(32);
   
   setChannel(120);
   
@@ -74,12 +75,13 @@ bool FLNRF24::checkRadio()
     while (!done)
     {
       // Fetch the payload, and see if this was the last one.
-      done = read( PACKET, 8 );
+      done = read( PACKET, 32 );
       destinationID = PACKET [0];
       senderID = PACKET [1];
       sensorID = PACKET [2];
       dataType = PACKET [3];
-      data = PACKET[4];
+      dataPriority = PACKET [4];
+      data = PACKET[5];
       return true;
       // Delay just a little bit to let the other unit
       // make the transition to receiver
@@ -115,7 +117,7 @@ bool FLNRF24::sendPacket()
   stopListening();
   while (!ok && millis() < giveUpTime)
   {
-    ok = write(&PACKET,8);
+    ok = write(&PACKET,32);
     //Serial.println("T");
     //Serial.println(ok);
     delay(100);
@@ -134,16 +136,18 @@ bool FLNRF24::sendPacket()
 }
 
 
-void FLNRF24::makePacket(byte _destinationID, byte _senderID, byte _sensorID, byte _dataType, byte _data )
+void FLNRF24::makePacket(byte _destinationID, byte _senderID, byte _sensorID, byte _dataType, byte _dataPriority, byte _data )
 {
   destinationID = _destinationID;
   senderID = _senderID;
   sensorID = _sensorID;
   dataType = _dataType;
+  dataPriority = _dataPriority;
   data = _data;
   PACKET[0] = destinationID;
   PACKET[1] = senderID;
   PACKET[2] = sensorID;
   PACKET[3] = dataType;
-  PACKET[4] = data;
+  PACKET[4] = dataPriority;
+  PACKET[5] = data;
 }

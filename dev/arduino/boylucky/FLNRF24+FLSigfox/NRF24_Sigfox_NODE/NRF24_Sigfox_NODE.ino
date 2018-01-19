@@ -27,7 +27,7 @@ byte temperature;
 
 // Settings
 #define MY_NODE_ID 1
-#define NODE_SEND_INTERVAL 5 // Interval to send data from sensors in minutes
+#define NODE_SEND_INTERVAL 1 // Interval to send data from sensors in minutes
 
 //unsigned long nextSleep = 5000;
 unsigned long sleepCycleCounter = 0;
@@ -83,7 +83,7 @@ void loop() {
    if (millis() > nextNodeSend)
    { 
      dhtRead();
-     nrf24.makePacket(0,MY_NODE_ID,1,0,temperature);
+     nrf24.makePacket(0,MY_NODE_ID,1,0,0,humidity);
      if (nrf24.sendPacket())
      {
        //Serial.println("Data send via NRF24 successfuly.");
@@ -91,7 +91,7 @@ void loop() {
        //Serial.println("Failed to send data via NRF24.");
      }
 
-     nrf24.makePacket(0,MY_NODE_ID,2,0,humidity);
+     nrf24.makePacket(0,MY_NODE_ID,2,0,0,temperature);
      if (nrf24.sendPacket())
      {
        //Serial.println("Data send via NRF24 successfuly.");
@@ -100,7 +100,7 @@ void loop() {
      }
 
      
-     nextNodeSend+= (NODE_SEND_INTERVAL * 60000);
+     nextNodeSend+= (NODE_SEND_INTERVAL * 30000);
      readyForSleep = true;
    }
    
@@ -118,6 +118,7 @@ void loop() {
        //delay(2000);
        // Enter power down state for 8 s with ADC and BOD module disabled
        LowPower.powerDown(SLEEP_8S, ADC_OFF, BOD_OFF);
+       if (nextNodeSend < 8001) {nextNodeSend = 8001;}
        nextNodeSend-=8000; // If sleep duration change then this value also have to be changed according to sleep duration milliseconds
      }
      // Power Up NRF24 module

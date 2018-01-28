@@ -11,11 +11,13 @@
 
 #include "Arduino.h"
 
+#define SIGFOX_READY 1
+#define SIGFOX_NOT_READY 2
 
 class FLSigfox
 {
   public:
-    FLSigfox(byte rx, byte tx, int baudRate); //rx, tx pin and baud rate for SoftwareSerial communication.
+    FLSigfox(byte msgPin); //rx, tx pin and baud rate for SoftwareSerial communication.
     void insideSensorsRead();
     void sleep();
     void wake();
@@ -30,6 +32,10 @@ class FLSigfox
     int temperature;
     int voltage;
     byte tempMessage;
+    bool ready();
+    void msgLed(byte message);
+    //void softwareReset();
+    void pinSet();
   private:
     char *toHex( uint8_t c );
     byte _dataArray[12] = {255,255,255,255,255,255,255,255,255,255,255,255};
@@ -37,6 +43,7 @@ class FLSigfox
     //byte _priorityArray[50] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     bool _sigfoxUp;
     SoftwareSerial* mySerial;
+    byte _msgPin;
 };
 
 #endif

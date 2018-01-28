@@ -7,6 +7,13 @@
   General Public License version 3 as published by the Free Software Foundation.
 */
 
+/*
+  Sigfox LoRaWAN modul is connected to hardware serial rx (digital 0 pin),
+  tx (digital 1 pin) of Arduino Uno or ATMEGA328P.
+  NRF24L01+ modul is connected to following pins:
+  
+*/
+
 #include <SoftwareSerial.h>
 #include <SPI.h>
 #include "nRF24L01.h"
@@ -24,23 +31,31 @@
 #define WAKE_DURATION 500 // Wake duration of the AVR and Radio in milliseconds
 //#define SLEEP_DURATION SLEEP_8S // Sleep duration of AVR and NRF24
 
+
 unsigned long nextSleep = 5000;
 unsigned long sleepCycleCounter = 0;
 unsigned long nextSigfoxSend = 20000;
 
-// Initiate FLSigfox object with rx, tx pin and baud rate
-// used for serial communication with Sigfox LPWAN module
-FLSigfox sigfox(7,8,9600);
+// Initiate FLSigfox object with digital pin number where LED can be attached
+// for Sigfox LoRaWAN modul status indication.
+// Sigfox LoRaWAN modul must have rx and tx pins connected to hardware rx, tx pin
+// of Arduino or ATMEGA328P. Hardware serial communication is used.
+FLSigfox sigfox(6);
 
 // Initiate FLNRF24 object with ce, csn pin
-FLNRF24 nrf24(9,10);
+FLNRF24 nrf24(8,10);
 
 
 void setup() {
   Serial.begin(9600);
   nrf24.init();
+  sigfox.wake();
+  sigfox.ready();
+  //Serial.print("AT$SF=1234565269353621457892");
+  //Serial.print((byte)millis());
+  //Serial.write(10);
+  //delay(13000);
   sigfox.sleep();
-
 }
 
 void loop() {
@@ -51,7 +66,7 @@ void loop() {
      //Serial.println(millis());
      //Serial.println(nextSigfoxSend);
     
-    Serial.println("Data received on NRF24 radio.");
+    //Serial.println("Data received on NRF24 radio.");
     sigfox.sensorAutoStore(nrf24.sensorID,nrf24.data,nrf24.dataPriority);
 /*
     Serial.print("Received payload: ");
@@ -123,17 +138,17 @@ void loop() {
    // Check if time to send data via Sigfox LPWAN
    if (millis() > nextSigfoxSend)
    { 
-     Serial.println("Time to send data via Sigfox.");
+     //Serial.println("Time to send data via Sigfox.");
      nrf24.sleep();
      delay(10);
      sigfox.wake();
      if (sigfox.dataSend())
      {
-       Serial.println("Data send successfully via Sigfox.");
+       //Serial.println("Data send successfully via Sigfox.");
      } else {
        // Retry one more time to send data via Sigfox
-       sigfox.dataSend();
-       Serial.println("Failed to send data via Sigfox.");
+       //sigfox.dataSend();
+       //Serial.println("Failed to send data via Sigfox.");
      }
 
      sigfox.sleep();

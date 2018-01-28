@@ -8,28 +8,43 @@
 
 #include "Arduino.h"
 #include "FLSigfox.h"
-#include <SoftwareSerial.h>
+//#include <SoftwareSerial.h>
 
 
-FLSigfox::FLSigfox(byte rx,byte tx, int baudRate) 
+
+FLSigfox::FLSigfox(byte msgPin) 
 {
-  mySerial = new SoftwareSerial(rx,tx);
-  mySerial->begin(baudRate);
+  pinMode(msgPin, OUTPUT);
+  _msgPin = msgPin;
 }
 
 void FLSigfox::sleep()
 {
-  mySerial->print('\r');
-  mySerial->print("AT$P=1");
-  mySerial->print('\r');
+  Serial.write(10);
+  Serial.print("AT$P=1");
+  Serial.write(10);
   _sigfoxUp=false;
   delay(10);
 }
 
+/*
+void FLSigfox::softwareReset()
+{
+  
+  Serial.write(10);
+  //Serial.print("AT:P9=U");
+  //Serial.write(10);
+  delay(10);
+  Serial.print("AT$P=2");
+  Serial.write(10);
+  //_sigfoxUp=true;
+  delay(10);
+}
+*/
+
 void FLSigfox::wake()
 {
-  mySerial->print('\n');
-  mySerial->print('\r');
+  Serial.write(10);
   _sigfoxUp=true;
   delay(500);
 }
@@ -37,20 +52,20 @@ void FLSigfox::wake()
 void FLSigfox::insideSensorsRead()
 {
   String inputString = "";      // string to hold incomming data
-  while (mySerial->available()) {  // // read incomming data if any to clear possible previous messages from Sigfox. Clear the Serial buffer.
-    mySerial->read();
+  while (Serial.available()) {  // // read incomming data if any to clear possible previous messages from Sigfox. Clear the Serial buffer.
+    Serial.read();
   }
-  mySerial->print("AT$V?");
-  mySerial->print('\r');
+  Serial.print("AT$V?");
+  Serial.write(10);
 
   // Wait until sigfox return something
-  while (!mySerial->available()) {
+  while (!Serial.available()) {
     delay(10);
   }
   // Revrite to get also the voltage measured during last transmission
-  while (mySerial->available()) {
+  while (Serial.available()) {
     // get the new byte:
-    char inChar = (char)mySerial->read();
+    char inChar = (char)Serial.read();
     // add it to the inputString:
     inputString += inChar;
   }
@@ -60,27 +75,28 @@ void FLSigfox::insideSensorsRead()
 
   inputString = "";      // string to hold incomming data
 
-  while (mySerial->available()) {  // read incomming data if any to clear possible previous messages from Sigfox. Clear the Serial buffer.
-    mySerial->read();
+  while (Serial.available()) {  // read incomming data if any to clear possible previous messages from Sigfox. Clear the Serial buffer.
+    Serial.read();
   }
   
-  mySerial->println("AT$T?");
+  Serial.print("AT$T?");
+  Serial.write(10);
   
   // Wait until sigfox return something
-  while (!mySerial->available()) {
+  while (!Serial.available()) {
     delay(10);
   }
-  while (mySerial->available()) {
+  while (Serial.available()) {
     // get the new byte:
-    char inChar = (char)mySerial->read();
+    char inChar = (char)Serial.read();
     // add it to the inputString:
     inputString += inChar;
   }
 
   temperature = inputString.toInt();
 
-  while (mySerial->available()) {  // read incomming data if any to clear possible other messages from Sigfox. Clear the Serial buffer.
-    mySerial->read();
+  while (Serial.available()) {  // read incomming data if any to clear possible other messages from Sigfox. Clear the Serial buffer.
+    Serial.read();
   }
 
 }
@@ -88,43 +104,101 @@ void FLSigfox::insideSensorsRead()
 
 
 bool FLSigfox::dataSend() {
+  Serial.write(10);
+  delay(10);
   String inputString = "";         // string to hold incoming data
 
   // Clear possible data in the serial buffer
-  while (mySerial->available()) {
-    char inChar = (char)mySerial->read();
+  while (Serial.available()) {
+    char inChar = (char)Serial.read();
   }
 
-  mySerial->print("AT$SF=");
+  Serial.print("AT$SF=");
   for (byte i=0; i<12; i++)
   {
-  mySerial->print(toHex(_dataArray[i]));
+  Serial.print(toHex(_dataArray[i]));
   }
-  mySerial->print('\r');
-
-  //Sigfox.println(zprava);
+  Serial.write(10);
+  
   // Wait until sigfox return something
-  while (!mySerial->available()) {
+  while (!Serial.available()) {
     delay(10);
   }
 
   // Then read the response  
-  while (mySerial->available()) {
+  while (Serial.available()) {
     // get the new byte:
-    char inChar = (char)mySerial->read();
+    char inChar = (char)Serial.read();
     // add it to the inputString:
     if (inChar != '\r' && inChar != '\n') {
       inputString += inChar;    
     }
 
   }
-  Serial.println(inputString);
+  //Serial.println(inputString);
   
   if (inputString == "OK") {
     return true;
   } else {
     return false;
   }
+}
+
+
+bool FLSigfox::ready() {
+    bool sigfoxOk = false;
+    msgLed(SIGFOX_NOT_READY);
+    byte serialResult = 0;
+    while (!sigfoxOk)
+    {
+      Serial.write(10);
+      Serial.print("AT");
+      Serial.write(10);
+      delay(10);
+      while (!Serial.available()) {
+        delay(10);
+      }
+      delay(10);
+      while (Serial.available()) {
+        // get the new byte:
+        byte chr = Serial.read();
+        //char inChar = (char)Serial.read();
+        // add it to the inputString:
+        if (chr != 10 && chr != 13) {
+          serialResult+= chr;    
+        }
+      }
+    //Serial.println(inputString);
+  
+      if (serialResult == 154) {
+        sigfoxOk = true;
+        msgLed(SIGFOX_READY);
+        return true;
+      } else {
+        sigfoxOk = false;
+        serialResult = 0;
+      }
+    }
+}
+
+
+void FLSigfox::msgLed(byte message){
+  switch (message) {
+    case SIGFOX_READY: // SIGFOX_READY
+      for (byte i = 0; i<5; i++)
+      {
+        digitalWrite(_msgPin,HIGH);
+        delay(300);
+        digitalWrite(_msgPin,LOW);
+        delay(300);
+      }
+      break;
+    case SIGFOX_NOT_READY: // SIGFOX_NOT_READY
+      digitalWrite(_msgPin,HIGH);
+      break;
+      
+  }
+
 }
 
 

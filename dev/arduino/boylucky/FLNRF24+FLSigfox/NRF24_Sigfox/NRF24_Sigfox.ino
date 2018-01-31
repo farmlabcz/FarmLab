@@ -27,20 +27,21 @@
 
 // Settings
 #define MY_NODE_ID 0
-#define SIGFOX_SEND_INTERVAL 2 // Sigfox LPWAN module connection interval in minutes
+#define SIGFOX_SEND_INTERVAL 15 // Sigfox LPWAN module connection interval in minutes
 #define WAKE_DURATION 500 // Wake duration of the AVR and Radio in milliseconds
 //#define SLEEP_DURATION SLEEP_8S // Sleep duration of AVR and NRF24
 
 
 unsigned long nextSleep = 5000;
 unsigned long sleepCycleCounter = 0;
-unsigned long nextSigfoxSend = 20000;
+unsigned long nextSigfoxSend = 25000;
+unsigned long checkTime = 0;
 
 // Initiate FLSigfox object with digital pin number where LED can be attached
 // for Sigfox LoRaWAN modul status indication.
 // Sigfox LoRaWAN modul must have rx and tx pins connected to hardware rx, tx pin
 // of Arduino or ATMEGA328P. Hardware serial communication is used.
-FLSigfox sigfox(6);
+FLSigfox sigfox(3);
 
 // Initiate FLNRF24 object with ce, csn pin
 FLNRF24 nrf24(8,10);
@@ -60,14 +61,15 @@ void setup() {
 
 void loop() {
   // Check if any data received on the NRF24 radio
+  checkTime = millis ();
   if (nrf24.checkRadio())
   {
 
      //Serial.println(millis());
      //Serial.println(nextSigfoxSend);
-    
     //Serial.println("Data received on NRF24 radio.");
     sigfox.sensorAutoStore(nrf24.sensorID,nrf24.data,nrf24.dataPriority);
+    nextSleep = nextSleep + (millis() - checkTime);
 /*
     Serial.print("Received payload: ");
     Serial.println(nrf24.PACKET[0]);
@@ -81,7 +83,7 @@ void loop() {
     Serial.println(nrf24.dataType);
     Serial.println("Fifth byte:"); 
     Serial.println(nrf24.data);
-/*
+
     
     Serial.println("Sensor ID:"); 
     Serial.println(sigfox.readStore(6));

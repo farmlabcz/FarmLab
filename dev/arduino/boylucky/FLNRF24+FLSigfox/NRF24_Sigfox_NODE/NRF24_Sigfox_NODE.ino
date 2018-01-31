@@ -98,7 +98,7 @@ void loop() {
      } else {
        //Serial.println("Failed to send data via NRF24.");
      }
-
+     //delay(500);
      
      nextNodeSend+= (NODE_SEND_INTERVAL * 30000);
      readyForSleep = true;

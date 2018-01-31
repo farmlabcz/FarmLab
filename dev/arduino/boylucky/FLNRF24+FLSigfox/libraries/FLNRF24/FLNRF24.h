@@ -8,6 +8,8 @@
 #include <RF24.h>
 #include "LowPower.h" 
 
+#define PAYLOAD_SIZE 7
+
 class FLNRF24 : public RF24
 {
   public:
@@ -40,16 +42,16 @@ void FLNRF24::init()
   begin();
   // 4 values to set for long range distance radio, set to MAX power for max long range
   // Max power 
-  setPALevel( RF24_PA_MIN ) ; 
+  setPALevel( RF24_PA_MAX ) ; 
   // Min speed
   setDataRate( RF24_250KBPS ) ;
   // 8 bits CRC
   setCRCLength( RF24_CRC_8 ) ;
   // optionally, increase the delay between retries & # of retries
-  setRetries(1,15);
+  setRetries(15,5);
   // optionally, reduce the payload size.  seems to
   // improve reliability
-  setPayloadSize(32);
+  setPayloadSize(PAYLOAD_SIZE);
   
   setChannel(120);
   
@@ -75,7 +77,7 @@ bool FLNRF24::checkRadio()
     while (!done)
     {
       // Fetch the payload, and see if this was the last one.
-      done = read( PACKET, 32 );
+      done = read( PACKET, PAYLOAD_SIZE );
       destinationID = PACKET [0];
       senderID = PACKET [1];
       sensorID = PACKET [2];
@@ -117,14 +119,15 @@ bool FLNRF24::sendPacket()
   stopListening();
   while (!ok && millis() < giveUpTime)
   {
-    ok = write(&PACKET,32);
+    ok = write(&PACKET,PAYLOAD_SIZE);
     //Serial.println("T");
     //Serial.println(ok);
-    delay(100);
-    LowPower.powerDown(SLEEP_120MS, ADC_OFF, BOD_OFF);
-    giveUpTime-=120;
+    //delay(10);
+    //LowPower.powerDown(SLEEP_120MS, ADC_OFF, BOD_OFF);
+    //giveUpTime-=120;
   }
   startListening();
+  delay(10);
   if (ok)
   {
     //Serial.println("OK OK");

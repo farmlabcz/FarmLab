@@ -12,7 +12,6 @@
 
 # Obsadenie
 * boylucky
-* martinius96
 * xloki
 * radimstr
 * boda
